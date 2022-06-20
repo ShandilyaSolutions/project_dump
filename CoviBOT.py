@@ -8,6 +8,7 @@ import datetime
 import requests
 from bs4 import BeautifulSoup as bs
 from datetime import date
+import re
 
 # Getting today's date in scraping suitable format
 d = date.today()
@@ -28,35 +29,26 @@ def dataGetter():
     all_spans = html_code.find_all("span")
 
     # removing all useless lines from the lists
-    for element in all_spans[:: -1]:
-        # implementing error handling
-        try:
-            d, m, y = element.split('.')
-            try:
-                if datetime.datetime(int(y), int(m), int(d)) == True:
-                    all_spans.remove(element)
-            except:
-                continue
-        except:
-            continue
+    data = list(all_spans)
+    reg = r"^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$"
 
-    print(all_spans)
+    for i in range(len(data)):
+        check = str(data[i]).removeprefix('<span>').removesuffix('</span>')
+        if re.search(reg, check):
+            data = data[:i]
+            break
 
-    counter = 0
-    requited_data = []  # holds fields necessary for our use
-    message = "as on : " + date_today + ", 08:00 IST (GMT+5:30)"
-    for span in all_spans:
-        counter = counter + 1
+    all_spans = data
+    
+    #raw_data = 
+    """Now we have to select the data that is usefull for us and forward it to another function called messageWriter()"""
 
-    print(counter)
-    counter = 0
+def messageWriter(raw_data):
     pass
-    # return requited_data
-
 
 def main():
-    # print(dataGetter())
-    dataGetter()
+    print(dataGetter())
+    # dataGetter()
 
 
 if __name__ == '__main__':
