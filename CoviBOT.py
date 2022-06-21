@@ -1,5 +1,5 @@
 """Coding tasks :
-    1. Get the covid data for India/Karnataka from Google
+    1. Get the covid data for India/Karnataka from Google (√)
     2. Send data as a message on whatsapp
     3. Set this code on a server so that it runs continuously."""
 
