@@ -2,13 +2,14 @@
     1. Get the covid data for India/Karnataka from Google
     2. Send data as a message on whatsapp
     3. Set this code on a server so that it runs continuously."""
-import datetime
 
 """Documentation goes here"""
 import requests
 from bs4 import BeautifulSoup as bs
 from datetime import date
-import re
+import json
+import os
+from twilio.rest import Client
 
 # Getting today's date in scraping suitable format
 d = date.today()
@@ -22,33 +23,38 @@ for i in date:
 
 def dataGetter():
     """This function gets the covid data from the Ministry of Health and Family Welfare of India and scrapes its covid data for a date"""
-    url = "https://www.mohfw.gov.in/"
+    url = "https://www.mohfw.gov.in/data/datanew.json"
     page = requests.get(url)
     html_code = bs(page.text, 'html.parser')
     # print(html_code.prettify())
-    all_spans = html_code.find_all("span")
+    data = json.loads(str(html_code))
+    # print(data)
+    for item in data:
+        # getting the data of Karnataka State situated at sno 16
+        if item['sno'] == '16':
+            return item
 
-    # removing all useless lines from the lists
-    data = list(all_spans)
-    reg = r"^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$"
-
-    for i in range(len(data)):
-        check = str(data[i]).removeprefix('<span>').removesuffix('</span>')
-        if re.search(reg, check):
-            data = data[:i]
-            break
-
-    all_spans = data
-    
-    #raw_data = 
-    """Now we have to select the data that is usefull for us and forward it to another function called messageWriter()"""
 
 def messageWriter(raw_data):
+    """This function converts the raw data acquired from the API into a presentable message format."""
+    # print(type(raw_data))
+    req = ['state_name', 'active', 'active', 'new_active', 'new_positive', 'new_death']
+    message = ""
+    message = message + date_today + '\n'
+    for itr in req:
+        message = message + itr.capitalize() + '  ->  ' + raw_data[itr] + '\n'
+    return message
+
+
+def messageSender(msg):
+    """This function sends the message to the mobile number using Twilio's Whatsapp API."""
     pass
 
+
 def main():
-    print(dataGetter())
-    # dataGetter()
+    raw_data = dataGetter()
+    msg = messageWriter(raw_data)
+    messageSender(msg)
 
 
 if __name__ == '__main__':
