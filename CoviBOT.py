@@ -2,16 +2,22 @@
     1. Get the covid data for India/Karnataka from Google (√)
     2. Send data as a message on whatsapp
     3. Set this code on a server so that it runs continuously."""
+import os
 
 """Documentation goes here"""
 import requests
 from bs4 import BeautifulSoup as bs
 from datetime import date
 import json
-import os
 from twilio.rest import Client
 
-# Getting today's date in scraping suitable format
+# setting up environment variables required for  twilio API
+ACC_SID = ''
+AUTH_TOKEN = ''
+
+client = Client(ACC_SID,AUTH_TOKEN)
+
+# Getting today's date in suitable format
 d = date.today()
 date = str(d.strftime("%B %d, %Y"))
 date_today = ''
@@ -38,16 +44,25 @@ def dataGetter():
 def messageWriter(raw_data):
     """This function converts the raw data acquired from the API into a presentable message format."""
     # print(type(raw_data))
-    req = ['state_name', 'active', 'active', 'new_active', 'new_positive', 'new_death']
+    req = ['state_name', 'active', 'new_positive', 'new_active',]
     message = ""
     message = message + date_today + '\n'
     for itr in req:
-        message = message + itr.capitalize() + '  ->  ' + raw_data[itr] + '\n'
+        if itr == 'state_name':
+            message = message + raw_data[itr] + '\n'
+        else :
+            message = message + itr.capitalize() + '  ->  ' + raw_data[itr] + '\n'
     return message
 
 
 def messageSender(msg):
     """This function sends the message to the mobile number using Twilio's Whatsapp API."""
+    message = client.messages.create(
+        body=msg,
+        from_='+16075272711',
+        to='+919142861330'
+    )
+    print("Message Sent !")
     pass
 
 
