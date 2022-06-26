@@ -266,7 +266,8 @@ init = function() {
 
       });
 
-      if(nearestPoint) {
+      if(nearestPoint)
+      {
         let strength = { x: oldMousePoint.x - e.clientX, y: oldMousePoint.y - e.clientY };
         strength = Math.sqrt((strength.x * strength.x) + (strength.y * strength.y)) * 10;
         if(strength > 100) strength = 100;
